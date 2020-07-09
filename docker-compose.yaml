@@ -1,0 +1,42 @@
+---
+version: '3'
+services:
+  assets:
+    image: farid:java-leiningen-python3
+    build: .
+    ports:
+      - "8000:8000"
+    restart: always
+    working_dir: /usr/src/myapp/front-end/public/
+    entrypoint: ["python3", "serve.py"]
+  frontend:
+    image: farid:java-leiningen-python3
+    build: .
+    ports:
+      - "8001:8001"
+    restart: always
+    environment:
+      - APP_PORT=8001
+      - STATIC_URL=http://assets:8000
+      - QUOTE_SERVICE_URL=http://quotes:8002
+      - NEWSFEED_SERVICE_URL=http://newsfeed:8003
+      - NEWSFEED_SERVICE_TOKEN=T1&eWbYXNWG1w1^YGKDPxAWJ@^et^&kX
+    entrypoint: ["java", "-jar", "/usr/src/myapp/build/front-end.jar"]
+  quotes:
+    image: farid:java-leiningen-python3
+    build: .
+    ports:
+      - "8002:8002"
+    restart: always
+    environment:
+      - APP_PORT=8002
+    entrypoint: ["java", "-jar", "/usr/src/myapp/build/quotes.jar"]
+  newsfeed:
+    image: farid:java-leiningen-python3
+    build: .
+    ports:
+      - "8003:8003"
+    restart: always
+    environment:
+      - APP_PORT=8003
+    entrypoint: ["java", "-jar", "/usr/src/myapp/build/newsfeed.jar"]
